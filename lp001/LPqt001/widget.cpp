@@ -9,23 +9,9 @@
 #include<fstream>
 #include<QString>
 #include<string>
-//void split(const string& s, vector<int>& tokens, char delim = ',') {
-//    tokens.clear();
-//    auto string_find_first_not = [s, delim](size_t pos = 0) -> size_t {
-//        for (size_t i = pos; i < s.size(); i++) {
-//            if (s[i] != delim) return i;
-//        }
-//        return string::npos;
-//    };
-//    size_t lastPos = string_find_first_not(0);
-//    size_t pos = s.find(delim, lastPos);
-//    while (lastPos != string::npos) {
-//        tokens.push_back(stoi((s.substr(lastPos, pos - lastPos))));
-//        lastPos = string_find_first_not(pos);
-//        pos = s.find(delim, lastPos);
-//    }
-//}
 
+
+//txt文件读取及内容转换
 void split( string& s, vector<double>& tokens, char delim = ',') {
     tokens.clear();
     ifstream fin;
@@ -49,6 +35,8 @@ void split( string& s, vector<double>& tokens, char delim = ',') {
         pos = s.find(delim, lastPos);
     }
 }
+
+//初始化
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , m_bOpenDevice(false)
@@ -95,6 +83,7 @@ Widget::Widget(QWidget *parent)
      //
     connect(ui->btnGetImage,&QPushButton::clicked,this,&Widget::slotbtnGetImage);
     connect(ui->btnFeature,&QPushButton::clicked,this,&Widget::feaextr);
+    connect(ui->human,&QPushButton::clicked,this,&Widget::HumanFea);
 
     updateState(GrabState_CloseGrab);
 }
@@ -104,6 +93,8 @@ Widget::~Widget()
     delete ui;
 }
 
+
+//设备开关
 void Widget::slotBtnOpenDevice()
 {
 
@@ -139,39 +130,6 @@ void Widget::slotBtnOpenDevice()
     qDebug()<<"Open success";
     m_bOpenDevice = true;
 }
-void Widget::slotbtnGetImage()
-{
-        string filename;
-        filename=(ui->BdEdit->text()).toStdString();
-//        ifstream fin;
-//        fin.open(filename);
-//        string tep;
-//        fin>>tep;
-//        fin.close();
-        this->sv.clear();
-        split(filename,this->sv,',');
-//        istringstream iss(tep);
-//        string temp;
-//        const char flag = ',';
-//        while (getline(iss, temp, flag)) {
-//                this->sv.push_back(stoi(temp));
-//            }
-
-//        this->cameraMatrix = cv::Mat::eye(3, 3, CV_64F);
-        this->cameraMatrix.at<double>(0, 0) = sv[0];
-        this->cameraMatrix.at<double>(0, 1) = sv[1];
-        this->cameraMatrix.at<double>(0, 2) = sv[2];
-        this->cameraMatrix.at<double>(1, 1) = sv[3];
-        this->cameraMatrix.at<double>(1, 2) = sv[4];
-
-        this->distCoeffs = cv::Mat::zeros(5, 1, CV_64F);
-        distCoeffs.at<double>(0, 0) = sv[5];
-        distCoeffs.at<double>(1, 0) = sv[6];
-        distCoeffs.at<double>(2, 0) = sv[7];
-        distCoeffs.at<double>(3, 0) = sv[8];
-        distCoeffs.at<double>(4, 0) = sv[9];
-        this->cgflag=1;
-}
 void Widget::slotBtnCloseDevice()
 {
     if(m_pMvCamera != nullptr)
@@ -187,6 +145,8 @@ void Widget::slotBtnCloseDevice()
        qDebug()<<"device is not create";
 }
 
+
+//图像抓取
 void Widget::slotBtnStartGrab()
 {
     slotBtnOpenDevice();
@@ -307,128 +267,10 @@ void Widget::slotDisImg(QImage &img)
 
 }
 
-void Widget::slotBtnSaveBMP()
-{
-    m_bSaveImgBMP = true;
-}
 
-void Widget::slotBtnSaveJPG()
-{
-    m_bSaveImgJPG = true;
-}
-void Widget::slotBtnSaveTIFF()
-{
-    m_bSaveImgTIFF = true;
-}
-void Widget::slotBtnSavePNG()
-{
-    m_bSaveImgPNG= true;
-}
 
-void Widget::slotBtnGetParam()
-{
-    int nRet = GetExposureTime();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Exposure Time Fail");
-        }
 
-        nRet = GetGain();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Gain Fail");
-        }
-
-        nRet = GetFrameRate();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Frame Rate Fail");
-        }
-        nRet=GetLight();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Brightness Fail");
-        }
-        nRet=GetSp();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Sharpness Fail");
-        }
-        m_bUpdateData = false;
-}
-
-void Widget::slotBtnSetParam()
-{
-    m_bUpdateData = true;
-
-        bool bIsSetSucceed = true;
-        int nRet = SetExposureTime();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","Set Exposure Time Fail");
-
-        }
-        nRet = SetGain();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","设置增益失败，增益范围：0~15.0062");
-        }
-        nRet = SetFrameRate();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","Set Frame Rate Fail");
-        }
-        nRet=SetLight();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","Set Brightness Fail");
-        }
-        nRet=SetSp();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","Set Sharpness Fail");
-        }
-        if (true == bIsSetSucceed)
-        {
-            QMessageBox::information(this,"Succeed","Set Parameter Succeed");
-        }
-}
-
-void Widget::updateState(GrabState ret)
-{
-    if(ret == GrabState_OpenGrab)
-    {
-        ui->btnCloseWin->setEnabled(false);
-        ui->B_getParam->setEnabled(true);
-        ui->B_setParam->setEnabled(true);
-        ui->B_getGamma->setEnabled(true);
-        ui->B_setGamma->setEnabled(true);
-        ui->btnSaveBMP->setEnabled(true);
-        ui->btnSaveJPG->setEnabled(true);
-        ui->btnSaveTIFF->setEnabled(true);
-        ui->btnSavePNG->setEnabled(true);
-        ui->btnGetImage->setEnabled(true);
-    }
-    else
-    {
-        ui->btnCloseWin->setEnabled(true);
-        ui->B_getParam->setEnabled(false);
-        ui->B_setParam->setEnabled(false);
-        ui->B_getGamma->setEnabled(false);
-        ui->B_setGamma->setEnabled(false);
-        ui->btnSaveBMP->setEnabled(false);
-        ui->btnSaveJPG->setEnabled(false);
-        ui->btnSaveTIFF->setEnabled(false);
-        ui->btnSavePNG->setEnabled(false);
-        ui->btnGetImage->setEnabled(true);
-    }
-}
-
+//特征提取
 void  Widget::feaextr(){
        string feaname=(ui->featureline->text()).toStdString();
        QStringList listTemp;
@@ -609,11 +451,22 @@ void  Widget::feaextr(){
 void  Widget::faceDect(QImage &img)
 {
     string facede="H:\downloader\OpenCV\etc\haarcascades\haarcascade_frontalface_default.xml";
+    //string eysde="H:\downloader\OpenCV\etc\haarcascades\haarcascade_eye.xml";
+    string fullde="H:\downloader\OpenCV\etc\haarcascades\haarcascade_fullbody.xml";
     cv::CascadeClassifier Classifier;
-    Classifier.load(facede);
+    switch(this->humanfeat){
+//    case 1:
+//      Classifier.load(eysde);
+//        break;
+    case 1:
+       Classifier.load(facede);
+        break;
+     case 2:
+        Classifier.load(fullde);
+    }
+
     qDebug()<<"slot frame";
     ui->label_5->clear();
-//    img = img.scaled(ui->label->width(), ui->label->height());
     img = img.scaled(ui->label_5->size(),Qt::IgnoreAspectRatio);
     ui->label_5->setScaledContents(true);
     Algorithm alg;
@@ -629,7 +482,35 @@ void  Widget::faceDect(QImage &img)
     ui->label_5->setPixmap(QPixmap::fromImage(retImg));
 
 }
-// 设置相机参数
+void Widget::slotbtnGetImage()
+{
+
+        string filename;
+        filename=(ui->BdEdit->text()).toStdString();
+        this->sv.clear();
+        split(filename,this->sv,',');
+        this->cameraMatrix.at<double>(0, 0) = sv[0];
+        this->cameraMatrix.at<double>(0, 1) = sv[1];
+        this->cameraMatrix.at<double>(0, 2) = sv[2];
+        this->cameraMatrix.at<double>(1, 1) = sv[3];
+        this->cameraMatrix.at<double>(1, 2) = sv[4];
+
+        this->distCoeffs = cv::Mat::zeros(5, 1, CV_64F);
+        distCoeffs.at<double>(0, 0) = sv[5];
+        distCoeffs.at<double>(1, 0) = sv[6];
+        distCoeffs.at<double>(2, 0) = sv[7];
+        distCoeffs.at<double>(3, 0) = sv[8];
+        distCoeffs.at<double>(4, 0) = sv[9];
+        this->cgflag=1;
+}
+void Widget::HumanFea()
+{
+   int tep=ui->humanfeature->toPlainText().toInt();
+   this->humanfeat=tep;
+}
+
+
+/////////////////////////////// 设置相机参数
 int Widget::GetExposureTime()
 {
     MVCC_FLOATVALUE stFloatValue = {0};
@@ -729,6 +610,29 @@ int Widget::SetLight()
         m_dLight = ui->B_light->toPlainText().toInt();
         return m_pMvCamera->SetIntValue("Brightness", (int)m_dLight);
 }
+int Widget::GetSp()
+{
+    MVCC_INTVALUE stIntValue = {0};
+        int nRet = m_pMvCamera->GetIntValue("Sharpness",&stIntValue);
+        if (MV_OK != nRet)
+        {
+            return nRet;
+        }
+        m_dSharpness =stIntValue.nCurValue;
+        QString sharpness_str = QString::number(m_dSharpness, 'f', 2);
+        ui->B_Sp->setPlainText(sharpness_str);
+        return MV_OK;
+}
+int Widget::SetSp()
+{
+    int nRet = m_pMvCamera->SetBoolValue("SharpnessEnable", true);
+        if (MV_OK != nRet)
+        {
+            return nRet;
+        }
+        m_dSharpness = ui->B_Sp->toPlainText().toInt();
+        return m_pMvCamera->SetIntValue("Sharpness", (int)m_dSharpness);
+}
 int Widget::GetGamma()
 {
     MVCC_FLOATVALUE stFloatValue = {0};
@@ -753,6 +657,9 @@ int Widget::SetGamma()
         m_dGammaEdit = ui->B__Gamma->toPlainText().toDouble();
         return m_pMvCamera->SetFloatValue("Gamma", (float)m_dGammaEdit);
 }
+
+//////////////////////////////////////
+
 
 void Widget::slotBtnGetGamma()
 {
@@ -781,4 +688,126 @@ void Widget::slotBtnSetGamma()
         {
             QMessageBox::information(this,"Succeed","Gamma Correction Succeed");
         }
+}
+void Widget::slotBtnGetParam()
+{
+    int nRet = GetExposureTime();
+        if (nRet != MV_OK)
+        {
+            QMessageBox::information(this,"error","Get Exposure Time Fail");
+        }
+
+        nRet = GetGain();
+        if (nRet != MV_OK)
+        {
+            QMessageBox::information(this,"error","Get Gain Fail");
+        }
+
+        nRet = GetFrameRate();
+        if (nRet != MV_OK)
+        {
+            QMessageBox::information(this,"error","Get Frame Rate Fail");
+        }
+        nRet=GetLight();
+        if (nRet != MV_OK)
+        {
+            QMessageBox::information(this,"error","Get Brightness Fail");
+        }
+        nRet=GetSp();
+        if (nRet != MV_OK)
+        {
+            QMessageBox::information(this,"error","Get Sharpness Fail");
+        }
+        m_bUpdateData = false;
+}
+
+void Widget::slotBtnSetParam()
+{
+    m_bUpdateData = true;
+
+        bool bIsSetSucceed = true;
+        int nRet = SetExposureTime();
+        if (nRet != MV_OK)
+        {
+            bIsSetSucceed = false;
+            QMessageBox::information(this,"error","Set Exposure Time Fail");
+
+        }
+        nRet = SetGain();
+        if (nRet != MV_OK)
+        {
+            bIsSetSucceed = false;
+            QMessageBox::information(this,"error","设置增益失败，增益范围：0~15.0062");
+        }
+        nRet = SetFrameRate();
+        if (nRet != MV_OK)
+        {
+            bIsSetSucceed = false;
+            QMessageBox::information(this,"error","Set Frame Rate Fail");
+        }
+        nRet=SetLight();
+        if (nRet != MV_OK)
+        {
+            bIsSetSucceed = false;
+            QMessageBox::information(this,"error","Set Brightness Fail");
+        }
+       nRet=SetSp();
+        if (nRet != MV_OK)
+        {
+            bIsSetSucceed = false;
+            QMessageBox::information(this,"error","Set Sharpness Fail");
+        }
+        if (true == bIsSetSucceed)
+        {
+            QMessageBox::information(this,"Succeed","Set Parameter Succeed");
+        }
+}
+
+void Widget::updateState(GrabState ret)
+{
+    if(ret == GrabState_OpenGrab)
+    {
+        ui->btnCloseWin->setEnabled(false);
+        ui->B_getParam->setEnabled(true);
+        ui->B_setParam->setEnabled(true);
+        ui->B_getGamma->setEnabled(true);
+        ui->B_setGamma->setEnabled(true);
+        ui->btnSaveBMP->setEnabled(true);
+        ui->btnSaveJPG->setEnabled(true);
+        ui->btnSaveTIFF->setEnabled(true);
+        ui->btnSavePNG->setEnabled(true);
+        ui->btnGetImage->setEnabled(true);
+    }
+    else
+    {
+        ui->btnCloseWin->setEnabled(true);
+        ui->B_getParam->setEnabled(false);
+        ui->B_setParam->setEnabled(false);
+        ui->B_getGamma->setEnabled(false);
+        ui->B_setGamma->setEnabled(false);
+        ui->btnSaveBMP->setEnabled(false);
+        ui->btnSaveJPG->setEnabled(false);
+        ui->btnSaveTIFF->setEnabled(false);
+        ui->btnSavePNG->setEnabled(false);
+        ui->btnGetImage->setEnabled(true);
+    }
+}
+
+
+//图像存储
+void Widget::slotBtnSaveBMP()
+{
+    m_bSaveImgBMP = true;
+}
+void Widget::slotBtnSaveJPG()
+{
+    m_bSaveImgJPG = true;
+}
+void Widget::slotBtnSaveTIFF()
+{
+    m_bSaveImgTIFF = true;
+}
+void Widget::slotBtnSavePNG()
+{
+    m_bSaveImgPNG= true;
 }

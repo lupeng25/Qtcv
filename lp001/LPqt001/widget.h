@@ -55,7 +55,8 @@ public slots:
     // g伽马校正相关槽函数
     void slotBtnGetGamma();
     void slotBtnSetGamma();
-
+//   特征检测
+    void HumanFea();
     void feaextr();
     void faceDect(QImage &img);
 
@@ -99,6 +100,7 @@ private:
     bool m_bSaveImgTIFF;
     bool m_bSaveImgPNG;
     bool m_bUpdateData;
+    int  humanfeat=2;
     vector<double> sv;
     int cgflag=0;
     cv::Mat cameraMatrix=cv::Mat::eye(3, 3, CV_64F);
