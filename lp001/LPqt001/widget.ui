@@ -210,7 +210,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>890</x>
      <y>180</y>
      <width>228</width>
-     <height>281</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -221,48 +221,6 @@ background-color: rgb(255, 255, 255);</string>
     <string>参数设置</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QLabel" name="label_6">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(55, 255, 174);</string>
-        </property>
-        <property name="text">
-         <string>亮度</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPlainTextEdit" name="B_light">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255,155, 55);</string>
-        </property>
-        <property name="placeholderText">
-         <string>请输入亮度值</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_12">
-      <item>
-       <widget class="QLabel" name="label_9">
-        <property name="text">
-         <string>锐度</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPlainTextEdit" name="B_Sp">
-        <property name="placeholderText">
-         <string>请输入锐度</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
@@ -401,7 +359,7 @@ background-color: rgb(255, 255, 255);</string>
    <property name="geometry">
     <rect>
      <x>890</x>
-     <y>470</y>
+     <y>370</y>
      <width>221</width>
      <height>101</height>
     </rect>
@@ -513,61 +471,10 @@ background-color: rgb(255, 255, 255);</string>
     <string>Shut</string>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget">
-   <property name="geometry">
-    <rect>
-     <x>750</x>
-     <y>460</y>
-     <width>131</width>
-     <height>57</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_4">
-    <item>
-     <widget class="QLineEdit" name="BdEdit"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="btnGetImage">
-      <property name="text">
-       <string>确定标定文件</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_2">
-   <property name="geometry">
-    <rect>
-     <x>750</x>
-     <y>520</y>
-     <width>131</width>
-     <height>91</height>
-    </rect>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_5">
-    <item>
-     <widget class="QLineEdit" name="featureline"/>
-    </item>
-    <item>
-     <widget class="QPushButton" name="btnFeature">
-      <property name="text">
-       <string>特征提取</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QPushButton" name="Camfea">
-      <property name="text">
-       <string>从相机提取</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QPlainTextEdit" name="label_233">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>460</x>
      <y>460</y>
      <width>421</width>
      <height>141</height>
@@ -595,27 +502,66 @@ border-image:url(1.jpg);
     <string/>
    </property>
   </widget>
-  <widget class="QWidget" name="verticalLayoutWidget_3">
+  <widget class="QPushButton" name="btnGetImage">
    <property name="geometry">
     <rect>
-     <x>550</x>
-     <y>470</y>
-     <width>141</width>
-     <height>123</height>
+     <x>900</x>
+     <y>570</y>
+     <width>101</width>
+     <height>31</height>
     </rect>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_6">
+   <property name="text">
+    <string>选取标定文件</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>520</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
     <item>
-     <widget class="QPlainTextEdit" name="humanfeature">
-      <property name="placeholderText">
-       <string>1.facedete;2.bodydete</string>
+     <widget class="QPushButton" name="bodypush">
+      <property name="text">
+       <string>body</string>
       </property>
      </widget>
     </item>
     <item>
      <widget class="QPushButton" name="human">
       <property name="text">
-       <string>确定</string>
+       <string>face</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWidget" name="horizontalLayoutWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>480</y>
+     <width>201</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout_3">
+    <item>
+     <widget class="QPushButton" name="btnFeature">
+      <property name="text">
+       <string>特征提取</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="Camfea">
+      <property name="text">
+       <string>从相机提取</string>
       </property>
      </widget>
     </item>

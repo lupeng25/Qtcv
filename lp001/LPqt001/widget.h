@@ -56,11 +56,13 @@ public slots:
     void slotBtnGetGamma();
     void slotBtnSetGamma();
 //   特征检测
-    void HumanFea();
+//    void HumanFea();
     void feaextr();
     QImage faceDect(QImage &img);
     void Camfeature(QImage &img);
     void Camyes();
+    void FaCe();
+    void BoDy();
 
 private:
     void updateState(GrabState ret);
@@ -72,9 +74,9 @@ private:
     double m_dGainEdit;      // 增益
     double m_dFrameRateEdit; // 帧率
     double m_dGammaEdit; // 伽马值
-    int m_dLight;//亮度值
-    int m_dSaturation;
-    int m_dSharpness;
+//    int m_dLight;//亮度值
+//    int m_dSaturation;
+//    int m_dSharpness;
 
     int GetExposureTime(); // ch:设置曝光时间 | en:Set Exposure Time
     int SetExposureTime();
@@ -84,15 +86,15 @@ private:
     int SetFrameRate();
     int GetGamma();    // ch:伽马矫正 | en:Set Gamma
     int SetGamma();
-    int GetLight();//设置亮度
-    int SetLight();
-//hsv_setting:
-    int SetH();
-    int GetH();
-    int SetS();
-    int GEtS();
-    int SetSp();
-    int GetSp();
+//    int GetLight();//设置亮度
+//    int SetLight();
+//    hsv_setting:
+//    int SetH();
+//    int GetH();
+//    int SetS();
+//    int GEtS();
+//    int SetSp();
+//    int GetSp();
 
 
 private:
@@ -102,9 +104,10 @@ private:
     bool m_bSaveImgPNG;
     bool m_bUpdateData;
     int  humanfeat=2;
-    int camflag=1;
+    int camflag=0;
     vector<double> sv;
     int cgflag=0;
+    int demoo=0;
     cv::Mat cameraMatrix=cv::Mat::eye(3, 3, CV_64F);
     cv::Mat distCoeffs;
     MvCamera* m_pMvCamera;

@@ -48,8 +48,6 @@ Widget::Widget(QWidget *parent)
     , m_bSaveImgTIFF(false)
     , m_bSaveImgPNG(false)
     , m_bUpdateData(false)
-    ,m_dSharpness(0)
-    , m_dLight(0)
     , m_dExposureEdit(0)
     , m_dGainEdit(0)
     , m_dFrameRateEdit(0)
@@ -83,8 +81,10 @@ Widget::Widget(QWidget *parent)
      //
     connect(ui->btnGetImage,&QPushButton::clicked,this,&Widget::slotbtnGetImage);
     connect(ui->btnFeature,&QPushButton::clicked,this,&Widget::feaextr);
-    connect(ui->human,&QPushButton::clicked,this,&Widget::HumanFea);
+//    connect(ui->human,&QPushButton::clicked,this,&Widget::HumanFea);
     connect(ui->Camfea,&QPushButton::clicked,this,&Widget::Camyes);
+    connect(ui->human,&QPushButton::clicked,this,&Widget::FaCe);
+    connect(ui->bodypush,&QPushButton::clicked,this,&Widget::BoDy);
     updateState(GrabState_CloseGrab);
 }
 
@@ -93,7 +93,14 @@ Widget::~Widget()
     delete ui;
 }
 
-
+void Widget::BoDy()
+{
+    this->demoo=2;
+}
+void Widget::FaCe()
+{
+    this->demoo=1;
+}
 //设备开关
 void Widget::slotBtnOpenDevice()
 {
@@ -160,8 +167,6 @@ void Widget::slotBtnStartGrab()
     m_pGrabThread = new GrabThread(m_pMvCamera);
 
     connect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::slotDisImg);
-//     connect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::faceDect);
-
     int nRet = m_pMvCamera->StartGrabbing();
 
     if (MV_OK != nRet)
@@ -190,13 +195,8 @@ void Widget::slotBtnStopGrab()
     m_pGrabThread->wait();
     m_pGrabThread->quit();
     disconnect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::slotDisImg);
-    ///////////////////////////////////////////////////////////////////////////////ss//
-//    disconnect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::faceDect);
-
     int nRet = m_pMvCamera->StopGrabbing();
-
     delete m_pGrabThread;
-//    m_pGrabThread->deleteLater();
     m_pGrabThread = nullptr;
 
     if (MV_OK != nRet)
@@ -219,29 +219,38 @@ void Widget::slotDisImg(QImage &img)
     qDebug()<<"slot frame";
     ui->label->clear();
     ui->label_5->clear();
-//    img = img.scaled(ui->label->width(), ui->label->height());
     img = img.scaled(ui->label->size(),Qt::IgnoreAspectRatio);
     ui->label->setScaledContents(true);
     ui->label_5->setScaledContents(true);
     Algorithm alg;
     cv::Mat matImg = alg.QImage2cvMat(img);
-    //QImage img2=this->faceDect(img);
 
-//    cv::threshold(matImg,matImg,128,255,1);
-
+    cv::CascadeClassifier Classifier;
     QImage retImg = alg.Mat2QImage(matImg);
     string facede="H:\\downloader\\OpenCV\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
     string fullde="H:\\downloader\\OpenCV\\etc\\haarcascades\\haarcascade_fullbody.xml";
-    cv::CascadeClassifier Classifier;
-    Classifier.load(facede);
+    string n1;
     vector<cv::Rect> faces;
     cv::Mat newimg=matImg;
-    Classifier.detectMultiScale(matImg, faces, 1.1, 3, 0, cv::Size(30, 30));
-    for (size_t t = 0; t < faces.size(); t++)
-         {
-           rectangle(newimg, faces[t], cv::Scalar(0, 255, 0), 2, 8);//画个绿框
-           cout<<"111111111111";
-         }
+    if(this->demoo==1){
+        n1=facede;
+        Classifier.load(n1);
+        Classifier.detectMultiScale(matImg, faces, 1.1, 3, 0, cv::Size(30, 30));
+        for (size_t t = 0; t < faces.size(); t++)
+             {
+               rectangle(newimg, faces[t], cv::Scalar(0, 255, 0), 2, 8);
+             }
+    }else if(this->demoo==2){
+        n1=fullde;
+        Classifier.load(n1);
+        Classifier.detectMultiScale(matImg, faces, 1.1, 3, 0, cv::Size(30, 30));
+        for (size_t t = 0; t < faces.size(); t++)
+             {
+               rectangle(newimg, faces[t], cv::Scalar(0, 255, 0), 2, 8);
+             }
+    }
+
+
     QImage ret2=alg.Mat2QImage(newimg);
     if(this->cgflag==0){
          ui->label->setPixmap(QPixmap::fromImage(retImg));
@@ -444,7 +453,8 @@ void Widget::Camfeature(QImage &img)
 }
 
 void  Widget::feaextr(){
-       string feaname=(ui->featureline->text()).toStdString();
+//       string feaname=(ui->featureline->text()).toStdString();
+       string feaname=QFileDialog::getOpenFileName(this,tr("选取几何图片"),"H:/",tr("Image Files (*.png *.jpg *.bmp)")).toStdString();
        QStringList listTemp;
        cv::Mat src = cv::imread(feaname);
         if (src.empty())
@@ -515,15 +525,10 @@ void  Widget::feaextr(){
         {
             cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
             int radius = cvRound(circles[i][2]);
-//            circle(dstImg, center, radius, Scalar(0, 255, 0), 5, 8, 0);
-//            circle(dstImg, center, 3, Scalar(0, 255, 0), -1);
             QString rl1="圆形"+QString::number(i + 1)+"中心: X"+QString::number(center.x)+" ,Y"+QString::number(center.y);
             QString rl2="圆形"+QString::number(i + 1)+"的面积为："+QString::number(3.14 * radius * radius);
             QString rl3="圆形"+QString::number(i + 1)+"的周长为："+QString::number(3.14 * 2 * radius );
             listTemp.append(rl1+"\n"+rl2+"\n"+rl3);
-//            cout << "圆形" << i + 1 << "中心" << center << endl;
-//            cout << "圆" << i + 1 << "的面积为：" << 3.14 * radius * radius << endl;
-//            cout << "圆" << i + 1 << "的周长为：" << 3.14 * 2 * radius << endl;
         }
 
         //多边形拟合操作
@@ -578,11 +583,6 @@ void  Widget::feaextr(){
             QString l2="矩形"+QString::number(i + 1)+"的面积为："+QString::number(contourArea(squares));
             QString l3="矩形"+QString::number(i + 1)+"的周长为："+QString::number(arcLength(squares, true) );
             listTemp.append(l1+"\n"+l2+"\n"+l3+"\n");
-//            ui->label_233->setPlainText(l1+"\n"+l2+"\n"+l3);
-//            cout << "矩形" << (i + 1) % 4 << "中心" << center << endl;
-//            cout << "矩形" << i + 1 << "的面积为：" << contourArea(squares) << endl;
-//            cout << "矩形" << i + 1 << "的周长为：" << arcLength(squares, true) << endl;
-//            circle(dstImg, center, 3, cv::Scalar(255, 0, 255), -1);
         }
 
 
@@ -591,34 +591,16 @@ void  Widget::feaextr(){
             cv::Point center;
             center.x = (triangle[i].x + triangle[i + 1].x + triangle[i + 2].x) / 3;
             center.y = (triangle[i].y + triangle[i + 1].y + triangle[i + 2].y) / 3;
-//            line(dstImg, triangle[i], triangle[i + 1], cv::Scalar(255, 0, 0), 4);
-//            line(dstImg, triangle[i + 1], triangle[i + 2], cv::Scalar(255, 0, 0), 4);
-//            line(dstImg, triangle[i], triangle[i + 2], cv::Scalar(255, 0, 0), 4);
-//            cout << "三角形" << (i + 1) % 3 << "中心" << center << endl;
-//            cout << "三角形" << i + 1 << "的面积为：" << contourArea(triangle) << endl;
-//            cout << "三角形" << i + 1 << "的周长为：" << arcLength(triangle, 1) << endl;
+
             QString tl1="三角形"+QString::number((i + 1) % 3)+"中心:X"+QString::number(center.x)+" ,Y"+QString::number(center.y);
             QString tl2="三角形"+QString::number(i + 1)+"的面积为："+QString::number(contourArea(triangle));
             QString tl3="三角形"+QString::number(i + 1)+"的周长为："+QString::number(arcLength(triangle, 1) );
-//            circle(dstImg, center, 3, cv::Scalar(255, 0, 0), -1);
             listTemp.append(tl1+"\n"+tl2+"\n"+tl3+"\n");
         }
         QString str = listTemp.join(";");
         ui->label_233->setPlainText(str);
 
-        //显示提取图像
-//       cv:: Mat extract(src.size(), CV_8UC3, cv::Scalar(255, 255, 255));
-//        for (size_t i = 0; i < squares.size(); i += 4)//描边操作
-//        {
-//            cv::Point center;
-//            center.x = (squares[i].x + squares[i + 2].x) / 2;
-//            center.y = (squares[i].y + squares[i + 2].y) / 2;
-//            line(extract, squares[i], squares[i + 1], cv::Scalar(255, 0, 255), 4);
-//            line(extract, squares[i + 1], squares[i + 2],cv:: Scalar(255, 0, 255), 4);
-//            line(extract, squares[i + 2], squares[i + 3], cv::Scalar(255, 0, 255), 4);
-//            line(extract, squares[i + 3], squares[i], cv::Scalar(255, 0, 255), 4);
-//            circle(extract, center, 3, cv::Scalar(255, 0, 255), -1);
-//        }
+
 }
 QImage  Widget::faceDect(QImage &img)
 {
@@ -654,10 +636,11 @@ QImage  Widget::faceDect(QImage &img)
 void Widget::slotbtnGetImage()
 {
 
-        string filename;
-        filename=(ui->BdEdit->text()).toStdString();
+//        string filename;
+//        filename=(ui->BdEdit->text()).toStdString();
+        string s1=QFileDialog::getOpenFileName(this,tr("选取标定参数文件"),"H:/",tr("file(*.txt)")).toStdString();
         this->sv.clear();
-        split(filename,this->sv,',');
+        split(s1,this->sv,',');
         this->cameraMatrix.at<double>(0, 0) = sv[0];
         this->cameraMatrix.at<double>(0, 1) = sv[1];
         this->cameraMatrix.at<double>(0, 2) = sv[2];
@@ -672,11 +655,11 @@ void Widget::slotbtnGetImage()
         distCoeffs.at<double>(4, 0) = sv[9];
         this->cgflag=1;
 }
-void Widget::HumanFea()
-{
-   int tep=ui->humanfeature->toPlainText().toInt();
-   this->humanfeat=tep;
-}
+//void Widget::HumanFea()
+//{
+//   int tep=ui->humanfeature->toPlainText().toInt();
+//   this->humanfeat=tep;
+//}
 
 
 /////////////////////////////// 设置相机参数
@@ -756,52 +739,7 @@ int Widget::SetFrameRate()
         m_dFrameRateEdit = ui->B__fps->toPlainText().toDouble();
         return m_pMvCamera->SetFloatValue("AcquisitionFrameRate", (float)m_dFrameRateEdit);
 }
-int Widget::GetLight()
-{
-    MVCC_INTVALUE stIntValue = {0};
-        int nRet = m_pMvCamera->GetIntValue("Brightness",&stIntValue);
-        if (MV_OK != nRet)
-        {
-            return nRet;
-        }
-        m_dLight =stIntValue.nCurValue;
-        QString light_str = QString::number(m_dLight, 'f', 2);
-        ui->B_light->setPlainText(light_str);
-        return MV_OK;
-}
-int Widget::SetLight()
-{
-    int nRet = m_pMvCamera->SetBoolValue("BrightnessEnable", true);
-        if (MV_OK != nRet)
-        {
-            return nRet;
-        }
-        m_dLight = ui->B_light->toPlainText().toInt();
-        return m_pMvCamera->SetIntValue("Brightness", (int)m_dLight);
-}
-int Widget::GetSp()
-{
-    MVCC_INTVALUE stIntValue = {0};
-        int nRet = m_pMvCamera->GetIntValue("Sharpness",&stIntValue);
-        if (MV_OK != nRet)
-        {
-            return nRet;
-        }
-        m_dSharpness =stIntValue.nCurValue;
-        QString sharpness_str = QString::number(m_dSharpness, 'f', 2);
-        ui->B_Sp->setPlainText(sharpness_str);
-        return MV_OK;
-}
-int Widget::SetSp()
-{
-    int nRet = m_pMvCamera->SetBoolValue("SharpnessEnable", true);
-        if (MV_OK != nRet)
-        {
-            return nRet;
-        }
-        m_dSharpness = ui->B_Sp->toPlainText().toInt();
-        return m_pMvCamera->SetIntValue("Sharpness", (int)m_dSharpness);
-}
+
 int Widget::GetGamma()
 {
     MVCC_FLOATVALUE stFloatValue = {0};
@@ -877,16 +815,7 @@ void Widget::slotBtnGetParam()
         {
             QMessageBox::information(this,"error","Get Frame Rate Fail");
         }
-        nRet=GetLight();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Brightness Fail");
-        }
-        nRet=GetSp();
-        if (nRet != MV_OK)
-        {
-            QMessageBox::information(this,"error","Get Sharpness Fail");
-        }
+
         m_bUpdateData = false;
 }
 
@@ -914,18 +843,7 @@ void Widget::slotBtnSetParam()
             bIsSetSucceed = false;
             QMessageBox::information(this,"error","Set Frame Rate Fail");
         }
-        nRet=SetLight();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","Set Brightness Fail");
-        }
-       nRet=SetSp();
-        if (nRet != MV_OK)
-        {
-            bIsSetSucceed = false;
-            QMessageBox::information(this,"error","Set Sharpness Fail");
-        }
+
         if (true == bIsSetSucceed)
         {
             QMessageBox::information(this,"Succeed","Set Parameter Succeed");
