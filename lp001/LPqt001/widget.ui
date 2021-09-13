@@ -491,7 +491,7 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QPushButton" name="btnCloseWin">
    <property name="geometry">
     <rect>
-     <x>1010</x>
+     <x>750</x>
      <y>570</y>
      <width>100</width>
      <height>30</height>
@@ -516,9 +516,9 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>760</x>
-     <y>530</y>
-     <width>121</width>
+     <x>580</x>
+     <y>480</y>
+     <width>141</width>
      <height>51</height>
     </rect>
    </property>
@@ -538,9 +538,9 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QWidget" name="verticalLayoutWidget_2">
    <property name="geometry">
     <rect>
-     <x>760</x>
-     <y>470</y>
-     <width>121</width>
+     <x>730</x>
+     <y>480</y>
+     <width>131</width>
      <height>51</height>
     </rect>
    </property>
@@ -560,10 +560,10 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QPlainTextEdit" name="label_233">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>520</y>
+     <x>20</x>
+     <y>460</y>
      <width>421</width>
-     <height>87</height>
+     <height>141</height>
     </rect>
    </property>
   </widget>
@@ -588,67 +588,10 @@ border-image:url(1.jpg);
     <string/>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>450</y>
-     <width>191</width>
-     <height>111</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>HSV设置</string>
-   </property>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>160</width>
-      <height>73</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>Hue</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="B_H"/>
-     </item>
-    </layout>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>50</y>
-      <width>160</width>
-      <height>73</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_11">
-     <item>
-      <widget class="QLabel" name="label_8">
-       <property name="text">
-        <string>Saturation</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="B_S"/>
-     </item>
-    </layout>
-   </widget>
-  </widget>
   <widget class="QWidget" name="verticalLayoutWidget_3">
    <property name="geometry">
     <rect>
-     <x>599</x>
+     <x>580</x>
      <y>540</y>
      <width>141</width>
      <height>61</height>
