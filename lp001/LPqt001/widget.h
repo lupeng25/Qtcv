@@ -59,7 +59,8 @@ public slots:
     void HumanFea();
     void feaextr();
     void faceDect(QImage &img);
-
+    void Camfeature(QImage &img);
+    void Camyes();
 
 private:
     void updateState(GrabState ret);
@@ -101,6 +102,7 @@ private:
     bool m_bSaveImgPNG;
     bool m_bUpdateData;
     int  humanfeat=2;
+    int camflag=1;
     vector<double> sv;
     int cgflag=0;
     cv::Mat cameraMatrix=cv::Mat::eye(3, 3, CV_64F);

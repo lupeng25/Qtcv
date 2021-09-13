@@ -84,7 +84,7 @@ Widget::Widget(QWidget *parent)
     connect(ui->btnGetImage,&QPushButton::clicked,this,&Widget::slotbtnGetImage);
     connect(ui->btnFeature,&QPushButton::clicked,this,&Widget::feaextr);
     connect(ui->human,&QPushButton::clicked,this,&Widget::HumanFea);
-
+    connect(ui->Camfea,&QPushButton::clicked,this,&Widget::Camyes);
     updateState(GrabState_CloseGrab);
 }
 
@@ -269,8 +269,160 @@ void Widget::slotDisImg(QImage &img)
 
 
 
-
 //特征提取
+void Widget::Camyes()
+{
+    this->camflag=1;
+}
+void Widget::Camfeature(QImage &img)
+{
+    img = img.scaled(ui->label->size(),Qt::IgnoreAspectRatio);
+    ui->label->setScaledContents(true);
+
+    Algorithm alg;
+    cv::Mat src = alg.QImage2cvMat(img);
+
+    QStringList listTemp;
+    if(this->camflag==1){
+     cv::Mat GaussImg;
+     //medianBlur(src, GaussImg,5);//中值滤波
+     GaussianBlur(src, GaussImg, cv::Size(7, 7), 0, 0);//高斯滤波
+     //imshow("Gauss Image", GaussImg);
+     cvtColor(GaussImg, GaussImg, cv::COLOR_BGR2GRAY);
+
+     //二值化操作
+     cv::Mat binary;
+     threshold(GaussImg, binary, 128, 255, cv::THRESH_BINARY);
+     //cv::namedWindow("binary Image", 0);
+     //imshow("binary Image", binary);
+
+     //形态学操作
+     cv::Mat morphImg;
+     cv::Mat kernel = getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5), cv::Point(-1, -1));
+     morphologyEx(binary, morphImg, cv::MORPH_CLOSE, kernel,cv:: Point(-1, -1), 1);
+     //imshow("morph Image", morphImg);
+
+     //阈值分割
+     cv::Mat contoursIm;
+     threshold(morphImg, contoursIm, 0, 255, cv::THRESH_BINARY + cv::THRESH_OTSU);
+     //imshow("阈值分割", contoursIm);
+
+
+     //轮廓发现
+     cv::Mat contoursImg = cv::Mat::zeros(src.size(), CV_8UC3);
+     vector<vector<cv::Point>>contours;//存储二维浮点型向量，这里面将来会存储找到du的边界的（x,y）坐标
+     vector<cv::Vec4i>hierarchy;//定义的层级。这个在找边界findcontours的时候会自动生成，这里只是给它开辟一个空间
+
+     findContours(contoursIm, contours, cv::RETR_LIST,cv:: CHAIN_APPROX_NONE);//保存物体边界上所有连续的轮廓点到contours向量内
+     int flags = 0;
+     for (size_t i = 0; i < contours.size(); i++)
+     {
+         cv::Rect rect = boundingRect(contours[i]);
+
+         if (rect.height == src.rows)
+         {
+             flags = 1;
+             contours.pop_back();
+         }
+
+
+         if (flags == 0)
+         {
+             drawContours(contoursImg, contours, static_cast<int>(i), cv::Scalar(0, 0, 255), 2, 8, hierarchy, 0,cv:: Point(0, 0));
+         }
+         flags = 0;
+     }
+
+     vector<cv::Point>triangle;
+     vector<cv::Point>approx;
+     vector<cv::Point>squares;
+
+     vector<cv::Vec3f>circles;//圆
+     HoughCircles(GaussImg, circles, cv::HOUGH_GRADIENT, 1, src.rows / 20, 100, 60, 0, 0);//rows/20为检测圆之间距离，100为传递给canny边缘检测算子的高阈值，60（它越小则可以检测到更多跟本不存在的圆，两个0为半径默认值）
+
+     cv::Mat dstImg(morphImg.rows, morphImg.cols, CV_8UC3, cv::Scalar(255, 255, 255));
+     for (size_t i = 0; i < circles.size(); i++)//画圆
+     {
+         cv::Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+         int radius = cvRound(circles[i][2]);
+         QString rl1="圆形"+QString::number(i + 1)+"中心: X"+QString::number(center.x)+" ,Y"+QString::number(center.y);
+         QString rl2="圆形"+QString::number(i + 1)+"的面积为："+QString::number(3.14 * radius * radius);
+         QString rl3="圆形"+QString::number(i + 1)+"的周长为："+QString::number(3.14 * 2 * radius );
+         listTemp.append(rl1+"\n"+rl2+"\n"+rl3);
+
+     }
+
+     //多边形拟合操作
+     for (size_t i = 0; i < contours.size(); i++)
+     {
+         approxPolyDP(contours[i], approx, arcLength(cv::Mat(contours[i]), true) * 0.02, true);                     //主要功能是把一个连续光滑曲线折线化，对图像轮廓点进行多边形拟合。
+         if (approx.size() == 4 && fabs(contourArea(cv::Mat(approx))) > 1000 && isContourConvex(cv::Mat(approx)))
+         {
+             double minDist = 1e10;
+
+             for (int i = 0; i < 4; i++)
+             {
+                 cv::Point side = approx[i] - approx[(i + 1) % 4];
+                 double squaredSideLength = side.dot(side);
+                 minDist = min(minDist, squaredSideLength);
+             }
+             if (minDist < 50)
+                 break;
+             for (int i = 0; i < 4; i++)
+                 squares.push_back(cv::Point(approx[i].x, approx[i].y));
+         }
+
+         approxPolyDP(contours[i], approx, arcLength(cv::Mat(contours[i]), true) * 0.1, true);
+         if (approx.size() == 3 && fabs(contourArea(cv::Mat(approx))) > 1000 && isContourConvex(cv::Mat(approx)))
+         {
+             double minDist = 1e10;
+
+             for (int i = 0; i < 3; i++)
+             {
+                 cv::Point side = approx[i] - approx[(i + 1) % 3];
+                 double squaredSideLength = side.dot(side);
+                 minDist = min(minDist, squaredSideLength);
+             }
+             if (minDist < 50)
+                 break;
+             for (int i = 0; i < 3; i++)
+                 triangle.push_back(cv::Point(approx[i].x, approx[i].y));
+         }
+         drawContours(dstImg, contours, i, cv::Scalar(0, 0, 255), 3);
+     }
+
+     for (size_t i = 0; i < squares.size(); i += 4)//描边操作
+     {
+         cv::Point center;
+         center.x = (squares[i].x + squares[i + 2].x) / 2;
+         center.y = (squares[i].y + squares[i + 2].y) / 2;
+         line(dstImg, squares[i], squares[i + 1], cv::Scalar(255, 0, 255), 4);
+         line(dstImg, squares[i + 1], squares[i + 2], cv::Scalar(255, 0, 255), 4);
+         line(dstImg, squares[i + 2], squares[i + 3],cv:: Scalar(255, 0, 255), 4);
+         line(dstImg, squares[i + 3], squares[i], cv::Scalar(255, 0, 255), 4);
+         QString l1="矩形"+QString::number((i + 1) % 4)+"中心"+QString::number(center.x)+" ,"+QString::number(center.y);
+         QString l2="矩形"+QString::number(i + 1)+"的面积为："+QString::number(contourArea(squares));
+         QString l3="矩形"+QString::number(i + 1)+"的周长为："+QString::number(arcLength(squares, true) );
+         listTemp.append(l1+"\n"+l2+"\n"+l3+"\n");
+
+     }
+
+
+     for (size_t i = 0; i < triangle.size(); i += 3)
+     {
+         cv::Point center;
+         center.x = (triangle[i].x + triangle[i + 1].x + triangle[i + 2].x) / 3;
+         center.y = (triangle[i].y + triangle[i + 1].y + triangle[i + 2].y) / 3;
+         QString tl1="三角形"+QString::number((i + 1) % 3)+"中心:X"+QString::number(center.x)+" ,Y"+QString::number(center.y);
+         QString tl2="三角形"+QString::number(i + 1)+"的面积为："+QString::number(contourArea(triangle));
+         QString tl3="三角形"+QString::number(i + 1)+"的周长为："+QString::number(arcLength(triangle, 1) );
+         listTemp.append(tl1+"\n"+tl2+"\n"+tl3+"\n");
+     }
+     QString str = listTemp.join(";");
+     ui->label_233->setPlainText(str);
+    }
+}
+
 void  Widget::feaextr(){
        string feaname=(ui->featureline->text()).toStdString();
        QStringList listTemp;
@@ -777,6 +929,8 @@ void Widget::updateState(GrabState ret)
         ui->btnSaveTIFF->setEnabled(true);
         ui->btnSavePNG->setEnabled(true);
         ui->btnGetImage->setEnabled(true);
+        ui->Camfea->setEnabled(true);
+        ui->btnGetImage->setEnabled(true);
     }
     else
     {
@@ -789,6 +943,8 @@ void Widget::updateState(GrabState ret)
         ui->btnSaveJPG->setEnabled(false);
         ui->btnSaveTIFF->setEnabled(false);
         ui->btnSavePNG->setEnabled(false);
+        ui->Camfea->setEnabled(false);
+        ui->btnGetImage->setEnabled(false);
         ui->btnGetImage->setEnabled(true);
     }
 }

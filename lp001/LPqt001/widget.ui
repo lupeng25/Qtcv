@@ -491,7 +491,7 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QPushButton" name="btnCloseWin">
    <property name="geometry">
     <rect>
-     <x>750</x>
+     <x>1010</x>
      <y>570</y>
      <width>100</width>
      <height>30</height>
@@ -516,9 +516,9 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>480</y>
-     <width>141</width>
+     <x>750</x>
+     <y>460</y>
+     <width>131</width>
      <height>51</height>
     </rect>
    </property>
@@ -538,10 +538,10 @@ background-color: rgb(255, 255, 255);</string>
   <widget class="QWidget" name="verticalLayoutWidget_2">
    <property name="geometry">
     <rect>
-     <x>730</x>
-     <y>480</y>
+     <x>750</x>
+     <y>520</y>
      <width>131</width>
-     <height>51</height>
+     <height>81</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -552,6 +552,13 @@ background-color: rgb(255, 255, 255);</string>
      <widget class="QPushButton" name="btnFeature">
       <property name="text">
        <string>特征提取</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="Camfea">
+      <property name="text">
+       <string>从相机提取</string>
       </property>
      </widget>
     </item>
@@ -591,8 +598,8 @@ border-image:url(1.jpg);
   <widget class="QWidget" name="verticalLayoutWidget_3">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>540</y>
+     <x>600</x>
+     <y>541</y>
      <width>141</width>
      <height>61</height>
     </rect>
