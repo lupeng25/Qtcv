@@ -58,7 +58,7 @@ public slots:
 //   特征检测
     void HumanFea();
     void feaextr();
-    void faceDect(QImage &img);
+    QImage faceDect(QImage &img);
     void Camfeature(QImage &img);
     void Camyes();
 

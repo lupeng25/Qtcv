@@ -160,7 +160,7 @@ void Widget::slotBtnStartGrab()
     m_pGrabThread = new GrabThread(m_pMvCamera);
 
     connect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::slotDisImg);
-     connect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::faceDect);
+//     connect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::faceDect);
 
     int nRet = m_pMvCamera->StartGrabbing();
 
@@ -191,7 +191,7 @@ void Widget::slotBtnStopGrab()
     m_pGrabThread->quit();
     disconnect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::slotDisImg);
     ///////////////////////////////////////////////////////////////////////////////ss//
-    disconnect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::faceDect);
+//    disconnect(m_pGrabThread,&GrabThread::grabImg,this,&Widget::faceDect);
 
     int nRet = m_pMvCamera->StopGrabbing();
 
@@ -218,23 +218,39 @@ void Widget::slotDisImg(QImage &img)
 {
     qDebug()<<"slot frame";
     ui->label->clear();
+    ui->label_5->clear();
 //    img = img.scaled(ui->label->width(), ui->label->height());
     img = img.scaled(ui->label->size(),Qt::IgnoreAspectRatio);
     ui->label->setScaledContents(true);
-
+    ui->label_5->setScaledContents(true);
     Algorithm alg;
     cv::Mat matImg = alg.QImage2cvMat(img);
+    //QImage img2=this->faceDect(img);
 
 //    cv::threshold(matImg,matImg,128,255,1);
 
     QImage retImg = alg.Mat2QImage(matImg);
-
+    string facede="H:\\downloader\\OpenCV\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
+    string fullde="H:\\downloader\\OpenCV\\etc\\haarcascades\\haarcascade_fullbody.xml";
+    cv::CascadeClassifier Classifier;
+    Classifier.load(facede);
+    vector<cv::Rect> faces;
+    cv::Mat newimg=matImg;
+    Classifier.detectMultiScale(matImg, faces, 1.1, 3, 0, cv::Size(30, 30));
+    for (size_t t = 0; t < faces.size(); t++)
+         {
+           rectangle(newimg, faces[t], cv::Scalar(0, 255, 0), 2, 8);//画个绿框
+           cout<<"111111111111";
+         }
+    QImage ret2=alg.Mat2QImage(newimg);
     if(this->cgflag==0){
          ui->label->setPixmap(QPixmap::fromImage(retImg));
+         ui->label_5->setPixmap(QPixmap::fromImage(ret2));
     }else if (this->cgflag==1) {
         undistort(matImg, matImg, cameraMatrix, distCoeffs);
         retImg = alg.Mat2QImage(matImg);
         ui->label->setPixmap(QPixmap::fromImage(retImg));
+        ui->label_5->setPixmap(QPixmap::fromImage(ret2));
 }
     if(m_bSaveImgBMP == true)
     {
@@ -604,16 +620,13 @@ void  Widget::feaextr(){
 //            circle(extract, center, 3, cv::Scalar(255, 0, 255), -1);
 //        }
 }
-void  Widget::faceDect(QImage &img)
+QImage  Widget::faceDect(QImage &img)
 {
-    string facede="H:\downloader\OpenCV\etc\haarcascades\haarcascade_frontalface_default.xml";
-    //string eysde="H:\downloader\OpenCV\etc\haarcascades\haarcascade_eye.xml";
-    string fullde="H:\downloader\OpenCV\etc\haarcascades\haarcascade_fullbody.xml";
+    string facede="H:\\downloader\\OpenCV\\etc\\haarcascades\\haarcascade_frontalface_default.xml";
+    string fullde="H:\\downloader\\OpenCV\\etc\\haarcascades\\haarcascade_fullbody.xml";
     cv::CascadeClassifier Classifier;
     switch(this->humanfeat){
-//    case 1:
-//      Classifier.load(eysde);
-//        break;
+
     case 1:
        Classifier.load(facede);
         break;
@@ -632,11 +645,11 @@ void  Widget::faceDect(QImage &img)
     for (size_t t = 0; t < faces.size(); t++)
          {
            rectangle(matImg, faces[t], cv::Scalar(0, 255, 0), 2, 8);//画个绿框
+           cout<<"111111111111";
          }
 
     QImage retImg = alg.Mat2QImage(matImg);
-    ui->label_5->setPixmap(QPixmap::fromImage(retImg));
-
+    return retImg;
 }
 void Widget::slotbtnGetImage()
 {

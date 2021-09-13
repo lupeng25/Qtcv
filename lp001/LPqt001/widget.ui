@@ -519,7 +519,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>750</x>
      <y>460</y>
      <width>131</width>
-     <height>51</height>
+     <height>57</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -541,7 +541,7 @@ background-color: rgb(255, 255, 255);</string>
      <x>750</x>
      <y>520</y>
      <width>131</width>
-     <height>81</height>
+     <height>91</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -598,10 +598,10 @@ border-image:url(1.jpg);
   <widget class="QWidget" name="verticalLayoutWidget_3">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>541</y>
+     <x>550</x>
+     <y>470</y>
      <width>141</width>
-     <height>61</height>
+     <height>123</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_6">
