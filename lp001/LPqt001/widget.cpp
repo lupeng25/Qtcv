@@ -264,6 +264,10 @@ void Widget::slotDisImg(QImage &img)
         QString filename = QFileDialog::getSaveFileName(NULL, tr("Save Image"), "", tr("Images (*.png)"));
         cv::imwrite(filename.toStdString(), matImg);
     }
+    if(this->camflag==1)
+    {
+        this->Camfeature(img);
+    }
 
 }
 
