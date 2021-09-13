@@ -63,7 +63,8 @@ public slots:
     void Camyes();
     void FaCe();
     void BoDy();
-
+    void Hand();
+    cv::Mat test(cv::Mat &img);
 private:
     void updateState(GrabState ret);
 
